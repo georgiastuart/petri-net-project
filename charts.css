@@ -1,14 +1,5 @@
-.bar {
-    display: inline-block;
-    width: 20px;
-    height: 75px;
-    background-color: orange;
-    margin-right: 2px;
-}
-
-.labels {
-    font-family: sans-serif;
-    font-size: 11px;
-    fill: white;
-    text-anchor: middle;
+.place {
+    fill: none;
+    stroke: black;
+    stroke-width: 3px;
 }
