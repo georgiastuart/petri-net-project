@@ -1,11 +1,32 @@
 .place {
-    fill: none;
+    fill: white;
     stroke: black;
     stroke-width: 3px;
+}
+
+.transition {
+    stroke: grey;
+    fill: grey;
 }
 
 .arc {
     stroke-width: 1px;
     stroke: black;
     fill: none;
+}
+
+.parentArc {
+    stroke-width: 0px;
+    stroke: red;
+    fill: none;
+}
+
+.label {
+    font-size: xx-small;
+    paint-order: stroke;
+    stroke: white;
+    stroke-width: 1px;
+    stroke-linecap: butt;
+    stroke-linejoin: miter;
+    font-weight: bold;
 }

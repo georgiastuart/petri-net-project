@@ -1,139 +1,56 @@
 (() => {
+    let w = 800;
+    let h = 450;
+    let place_radius = 15;
+    let transitionHeight = 10;
+
+    class Place {
+        constructor(name, x, y, label) {
+            this.name = name;
+            this.x = x;
+            this.y = y;
+            this.label = label;
+            this.token = false;
+        }
+    }
+
+    class Transition {
+        constructor(name, x, y, label) {
+            this.name = name;
+            this.x = x;
+            this.y = y;
+            this.label = label;
+            this.active = false;
+            this.width = 80;
+        }
+    }
+
     let places = [
         // Dirty Dishes in Dishwasher
-        {
-            name: "A",
-            x: 600,
-            y: 300,
-        },
-        {
-            name: "B",
-            x: 650,
-            y: 300
-        },
-        {
-            name: "C",
-            x: 700,
-            y: 300
-        },
-
-        // Start Dishwasher
-        {
-            name: "D",
-            x: 550,
-            y: 300
-        },
-
-        // Dishwasher ready
-        {
-            name: "E",
-            x: 750,
-            y: 250
-        },
-
-        // Dishwasher loaded
-        {
-            name: "F",
-            x: 650,
-            y: 200
-        },
-
-        // Clean Dishes
-        {
-            name: "G",
-            x: 600,
-            y: 100,
-        },
-        {
-            name: "H",
-            x: 650,
-            y: 100
-        },
-        {
-            name: "I",
-            x: 700,
-            y: 100
-        },
-
-        // Chef Ready
-        {
-            name: "chef",
-            x: 400,
-            y: 375
-        },
-
-        // Ingredients chopped
-        {
-            name: "K",
-            x: 250,
-            y: 300
-        },
-
-        // Ingredients cooked
-        {
-            name: "L",
-            x: 250,
-            y: 200
-        },
-
-        // Counter Dirty
-        {
-            name: "M",
-            x: 350,
-            y: 200
-        },
-
-        // Counter Clean
-        {
-            name: "M",
-            x: 350,
-            y: 150
-        },
-
-        // Food Served
-        {
-            name: "M",
-            x: 250,
-            y: 100
-        },
-
-        // Family Ready
-        {
-            name: "family",
-            x: 100,
-            y: 375
-        },
-
+        new Place("A", 600, 300, "Dish Dirty"),
+        new Place("B", 650, 300, "Dish Dirty"),
+        new Place("C", 700, 300, "Dish Dirty"),
+        new Place("E", 750, 250, "Dishwasher Ready"),
+        new Place("F", 650, 200, "Dishwasher Running"),
+        new Place("H", 650, 100, "Dish Clean"),
+        new Place("chef", 400, 375, "Chef Ready"),
+        new Place("K", 250, 300, "Ingredients Ready"),
+        new Place("L", 250, 200, "Food Cooked"),
+        new Place("M", 350, 200, "Counter Dirty"),
+        new Place("N", 350, 100, "Counter Clean"),
+        new Place("O", 250, 100, "Food Served"),
+        new Place("family", 100, 375, "Family Ready"),
     ];
 
 
     let transitions = [
-        {
-            // Load dishwasher
-            name: "t1",
-            x: 600,
-            y: 245,
-            width: 100,
-            height: 5
-        },
-
-        {
-            // Run Dishwasher
-            name: "t2",
-            x: 600,
-            y: 145,
-            width: 100,
-            height: 5
-        },
-
-        {
-            // Put Away Dishes
-            name: "t3",
-            x: 600,
-            y: 45,
-            width: 100,
-            height: 5
-        }
+        new Transition("t1", 600, 250, "Load Dishwasher"),
+        new Transition("t2", 600, 150, "Run Dishwasher"),
+        new Transition("t3", 600, 50, "Unload Dishwasher"),
+        new Transition("t4", 320, 150, "Clean Counter"),
+        new Transition("t6", 220, 150, "Serve Food"),
+        new Transition("t5", 220, 250, "Cook Food"),
+        new Transition("t7", 220, 50, "Eat")
     ];
 
     let arcs = [
@@ -157,7 +74,186 @@
             start: "F",
             end: "t2"
         },
-
+        {
+            start: "t2",
+            end: "H"
+        },
+        {
+            start: "H",
+            end: "t3"
+        },
+        {
+            start: "chef",
+            end: "t1"
+        },
+        {
+            start: "chef",
+            end: "t2"
+        },
+        {
+            start: "chef",
+            end: "t3"
+        },
+        {
+            start: "t1",
+            midpoints: [
+                {x: 650, y: 200},
+                {x: 500, y: 300}
+            ],
+            end: "chef"
+        },
+        {
+            start: "t2",
+            midpoints: [
+                {x: 650, y: 100},
+                {x: 500, y: 200}
+            ],
+            end: "chef"
+        },
+        {
+            start: "t3",
+            midpoints: [
+                {x: 600, y: 10},
+                {x: 500, y: 10}
+            ],
+            end: "chef"
+        },
+        {
+            start: "t4",
+            midpoints: [
+                {x: 400, y: 100},
+                {x: 450, y: 200}
+            ],
+            end: "chef"
+        },
+        {
+            start: "t5",
+            midpoints: [
+                {x: 250, y: 225},
+                {x: 275, y: 225}
+            ],
+            end: "chef"
+        },
+        {
+            start: "t6",
+            midpoints: [
+                {x: 250, y: 125},
+                {x: 300, y: 125}
+            ],
+            end: "chef"
+        },
+        {
+            start: "t7",
+            midpoints: [
+                {x: 250, y: 25},
+                {x: 300, y: 25}
+            ],
+            end: "chef"
+        },
+        {
+            start: "chef",
+            midpoints: [{x: 400, y: 200}],
+            end: "t4"
+        },
+        {
+            start: "chef",
+            end: "t5"
+        },
+        {
+            start: "chef",
+            end: "t6"
+        },
+        {
+            start: "chef",
+            end: "t7"
+        },
+        {
+            start: "family",
+            end: "t7"
+        },
+        {
+            start: "t7",
+            midpoints: [{x: 100, y: 200}],
+            end: "family"
+        },
+        {
+            start: "K",
+            end: "t5"
+        },
+        {
+            start: "t5",
+            end: "L"
+        },
+        {
+            start: "L",
+            end: "t6"
+        },
+        {
+            start: "t6",
+            end: "O"
+        },
+        {
+            start: "O",
+            end: "t7"
+        },
+        {
+            start: "N",
+            midpoints: [
+                {x: 300, y: 100},
+                {x: 300, y: 350}
+            ],
+            end: "t5"
+        },
+        {
+            start: "M",
+            end: "t4"
+        },
+        {
+            start: "t4",
+            end: "N"
+        },
+        {
+            start: "E",
+            midpoints: [
+                {x: 700, y: 280}
+            ],
+            end: "t1"
+        },
+        {
+            start: "t3",
+            midpoints: [
+                {x: 650, y: 20},
+                {x: 700, y: 20}
+            ],
+            end: "E"
+        },
+        {
+            start: "t5",
+            end: "M"
+        },
+        {
+            start: "t5",
+            midpoints: [{x: 300, y: 220}],
+            end: "A"
+        },
+        {
+            start: "t7",
+            midpoints: [
+                {x: 250, y: 20},
+                {x: 400, y: 20},
+                {x: 500, y: 400},
+            ],
+            end: "B"
+        },
+        {
+            start: "t7",
+            midpoints: [
+                {x: 250, y: 20},
+                {x: 400, y: 20},
+                {x: 500, y: 400},
+            ],
+            end: "C"
+        }
     ];
 
     let placesAndTransitions = places.concat(transitions);
@@ -170,33 +266,40 @@
         if (startObj.hasOwnProperty("width")) {
             start = {
                 x: startObj.x + startObj.width / 2.0,
-                y: startObj.y
+                y: startObj.y,
+                startType: "transition"
             }
         } else {
             start = {
                 x: startObj.x,
-                y: startObj.y
+                y: startObj.y,
+                startType: "place"
             }
         }
 
         if (endObj.hasOwnProperty("width")) {
             end = {
                 x: endObj.x + endObj.width / 2.0,
-                y: endObj.y
+                y: endObj.y,
+                endType: "transition"
             }
         } else {
             end = {
                 x: endObj.x,
-                y: endObj.y
+                y: endObj.y,
+                endType: "place"
             }
         }
 
-        return [start, end]
+        if (arc.hasOwnProperty("midpoints")) {
+            return [start].concat(arc.midpoints).concat([end])
+        } else {
+            return [start, end]
+        }
+
     };
 
-    let w = 800;
-    let h = 400;
-    let place_radius = 15;
+
 
     console.log('Getting here');
     let svg = d3.select("#d3div")
@@ -218,6 +321,40 @@
         .style("fill", "black");
     // end
 
+    var line = d3.line()
+        .x((d) => d.x)
+        .y((d) => d.y)
+        .curve(d3.curveBasis);
+
+
+    for (let arc of arcs) {
+        let arcPath = assembleArcPaths(arc);
+        console.log();
+        let path = svg.append("path")
+            .datum(arcPath)
+            .attr("class", "parentArc")
+            .attr("d", line);
+        // .attr("marker-end", "url(#arrowhead)");
+
+        path = path.node();
+
+        if (arcPath[arcPath.length - 1].endType === "place") {
+            let new_end = path.getPointAtLength(path.getTotalLength() - place_radius - 7);
+            arcPath.pop();
+            arcPath.push(new_end);
+        } else {
+            let new_end = path.getPointAtLength(path.getTotalLength() - transitionHeight - 2);
+            arcPath.pop();
+            arcPath.push(new_end);
+        }
+
+        svg.append("path")
+            .datum(arcPath)
+            .attr("class", "arc")
+            .attr("d", line)
+            .attr("marker-end", "url(#arrowhead)");
+
+    }
 
     svg.selectAll("circle")
         .data(places)
@@ -233,40 +370,32 @@
         .enter()
         .append("rect")
         .attr("x", (d) => d.x)
-        .attr("y", (d) => d.y)
+        .attr("y", (d) => d.y - transitionHeight / 2)
         .attr("width", (d) => d.width)
-        .attr("height", (d) => d.height)
+        .attr("height", transitionHeight)
         .attr("rx", 3)
-        .attr("ry", 3);
+        .attr("ry", 3)
+        .attr("class", "transition");
 
     svg.selectAll(".transitionText")
         .data(transitions)
         .enter()
         .append("text")
-        .text((d) => d.name)
-        .attr("x", (d) => d.x)
-        .attr("y", (d) => d.y);
+        .text((d) => d.label)
+        .attr("x", (d) => d.x + 5)
+        .attr("y", (d) => d.y + transitionHeight / 3)
+        .attr("class", "label");
 
     svg.selectAll(".placeText")
         .data(places)
         .enter()
         .append("text")
-        .text((d) => d.name)
-        .attr("x", (d) => d.x)
-        .attr("y", (d) => d.y);
+        .text((d) => d.label)
+        .attr("x", (d) => d.x - place_radius - 10)
+        .attr("y", (d) => d.y + place_radius + 10)
+        .attr("class", "label");
 
-    var line = d3.line()
-        .x((d) => d.x)
-        .y((d) => d.y);
 
-    for (let arc of arcs) {
-        console.log(assembleArcPaths(arc));
-        svg.append("path")
-            .datum(assembleArcPaths(arc))
-            .attr("class", "arc")
-            .attr("d", line)
-            .attr("marker-end", "url(#arrowhead)")
-    }
 
 
 })();
