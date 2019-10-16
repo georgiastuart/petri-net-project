@@ -140,8 +140,59 @@
         {
             start: "A",
             end: "t1"
-        }
+        },
+        {
+            start: "B",
+            end: "t1"
+        },
+        {
+            start: "C",
+            end: "t1"
+        },
+        {
+            start: "t1",
+            end: "F"
+        },
+        {
+            start: "F",
+            end: "t2"
+        },
+
     ];
+
+    let placesAndTransitions = places.concat(transitions);
+
+    let assembleArcPaths = (arc) => {
+        let startObj = placesAndTransitions.find((e) => arc.start === e.name);
+        let endObj = placesAndTransitions.find((e) => arc.end === e.name);
+        let start, end;
+
+        if (startObj.hasOwnProperty("width")) {
+            start = {
+                x: startObj.x + startObj.width / 2.0,
+                y: startObj.y
+            }
+        } else {
+            start = {
+                x: startObj.x,
+                y: startObj.y
+            }
+        }
+
+        if (endObj.hasOwnProperty("width")) {
+            end = {
+                x: endObj.x + endObj.width / 2.0,
+                y: endObj.y
+            }
+        } else {
+            end = {
+                x: endObj.x,
+                y: endObj.y
+            }
+        }
+
+        return [start, end]
+    };
 
     let w = 800;
     let h = 400;
@@ -152,6 +203,20 @@
         .append("svg")
         .attr("viewBox", "0 0 " + w + " " + h)
         .attr("preserveAspectRatio", "xMidYMid meet");
+
+
+    // from https://stackoverflow.com/questions/36579339/how-to-draw-line-with-arrow-using-d3-js
+    svg.append("svg:defs").append("svg:marker")
+        .attr("id", "arrowhead")
+        .attr("refX", 6)
+        .attr("refY", 6)
+        .attr("markerWidth", 30)
+        .attr("markerHeight", 30)
+        .attr("orient", "auto")
+        .append("path")
+        .attr("d", "M 0 0 12 6 0 12 3 6")
+        .style("fill", "black");
+    // end
 
 
     svg.selectAll("circle")
@@ -190,10 +255,18 @@
         .attr("x", (d) => d.x)
         .attr("y", (d) => d.y);
 
-    svg.selectAll(".arcs")
-        .data(arcs)
-        .enter()
-        .append()
+    var line = d3.line()
+        .x((d) => d.x)
+        .y((d) => d.y);
+
+    for (let arc of arcs) {
+        console.log(assembleArcPaths(arc));
+        svg.append("path")
+            .datum(assembleArcPaths(arc))
+            .attr("class", "arc")
+            .attr("d", line)
+            .attr("marker-end", "url(#arrowhead)")
+    }
 
 
 })();

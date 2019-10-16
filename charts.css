@@ -3,3 +3,9 @@
     stroke: black;
     stroke-width: 3px;
 }
+
+.arc {
+    stroke-width: 1px;
+    stroke: black;
+    fill: none;
+}
