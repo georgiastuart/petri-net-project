@@ -31,7 +31,7 @@
         new Place("B", 650, 300, "Dish Dirty"),
         new Place("C", 700, 300, "Dish Dirty"),
         new Place("E", 750, 250, "Dishwasher Ready"),
-        new Place("F", 650, 200, "Dishwasher Running"),
+        new Place("F", 650, 200, "Dishwasher Loaded"),
         new Place("H", 650, 100, "Dish Clean"),
         new Place("chef", 400, 375, "Chef Ready"),
         new Place("K", 250, 300, "Ingredients Ready"),
@@ -41,6 +41,18 @@
         new Place("O", 250, 100, "Food Served"),
         new Place("family", 100, 375, "Family Ready"),
     ];
+
+    places.find((place) => place.name === "chef").token = true;
+    places.find((place) => place.name === "A").token = true;
+    places.find((place) => place.name === "B").token = true;
+    places.find((place) => place.name === "C").token = true;
+    places.find((place) => place.name === "family").token = true;
+    places.find((place) => place.name === "M").token = true;
+    places.find((place) => place.name === "E").token = true;
+    places.find((place) => place.name === "K").token = true;
+
+
+
 
 
     let transitions = [
@@ -356,7 +368,45 @@
 
     }
 
-    svg.selectAll("circle")
+    let checkIfActive = function (d) {
+        let connectedNodes = arcs.filter((arc) => arc.end === d.name);
+        for (let node of connectedNodes) {
+            let place = places.find((place) => place.name === node.start);
+            console.log(place);
+            if (!place.token) {
+                d.active = false;
+                return false;
+            }
+        }
+        d.active = true;
+        return true;
+    };
+
+    let activateTransition = (transition) => {
+        let inputNodes = arcs.filter((arc) => arc.end === transition.name);
+        console.log(inputNodes);
+        for (let node of inputNodes) {
+            console.log(node.start);
+            d3.select("." + node.start)
+                .classed("tokenClick", false)
+                .classed("token", true);
+
+            let place = places.find((place) => place.name === node.start);
+            console.log(place);
+            place.token = false;
+        }
+
+        let outputNodes = arcs.filter((arc) => arc.start === transition.name);
+
+        for (let node of outputNodes) {
+            d3.select("." + node.end)
+                .classed("tokenClick", true)
+                .classed("token", false);
+            places.find((place) => place.name === node.end).token = true;
+        }
+    };
+
+    svg.selectAll(".place")
         .data(places)
         .enter()
         .append("circle")
@@ -364,6 +414,26 @@
         .attr("cx", (d) => d.x)
         .attr("cy", (d) => d.y)
         .attr("class", "place");
+
+    svg.selectAll(".token")
+        .data(places)
+        .enter()
+        .append("circle")
+        .attr("r", place_radius - 5)
+        .attr("cx", (d) => d.x)
+        .attr("cy", (d) => d.y)
+        .attr("class", (d) => d.name)
+        .classed("token", (d) => !d.token)
+        .classed("tokenClick", (d) => d.token)
+        .on("click", function (d) {
+            d.token = !d.token;
+            d3.select(this)
+                .classed("tokenClick", d.token)
+                .classed("token", !d.token);
+
+            svg.selectAll("rect")
+                .classed("transitionActive", (d) => checkIfActive(d))
+        });
 
     svg.selectAll("rect")
         .data(transitions)
@@ -375,7 +445,16 @@
         .attr("height", transitionHeight)
         .attr("rx", 3)
         .attr("ry", 3)
-        .attr("class", "transition");
+        .attr("class", "transition")
+        .classed("transitionActive", (d) => checkIfActive(d))
+        .on("click", function (d) {
+            if (d.active) {
+                activateTransition(d)
+            }
+
+            svg.selectAll("rect")
+                .classed("transitionActive", (d) => checkIfActive(d));
+        });
 
     svg.selectAll(".transitionText")
         .data(transitions)
@@ -384,7 +463,15 @@
         .text((d) => d.label)
         .attr("x", (d) => d.x + 5)
         .attr("y", (d) => d.y + transitionHeight / 3)
-        .attr("class", "label");
+        .attr("class", "label")
+        .on("click", function (d) {
+            if (d.active) {
+                activateTransition(d)
+            }
+
+            svg.selectAll("rect")
+                .classed("transitionActive", (d) => checkIfActive(d));
+        });
 
     svg.selectAll(".placeText")
         .data(places)

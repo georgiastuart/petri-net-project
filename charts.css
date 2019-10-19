@@ -4,9 +4,25 @@
     stroke-width: 3px;
 }
 
+.token {
+    fill: white;
+    stroke: white;
+    stroke-width: 1px;
+}
+
+.tokenClick {
+    fill: black;
+    stroke: black;
+}
+
 .transition {
     stroke: grey;
     fill: grey;
+}
+
+.transitionActive {
+    stroke: orange;
+    fill: orange;
 }
 
 .arc {
